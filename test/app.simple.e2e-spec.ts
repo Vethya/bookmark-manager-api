@@ -222,29 +222,23 @@ describe('App E2E Tests (Mock DB)', () => {
 
     it('should handle validation errors', async () => {
       // Test registration with invalid data
-      // Note: Mock response will still be 201, but this tests the endpoint structure
-      const response = await request(app.getHttpServer())
+      await request(app.getHttpServer())
         .post('/auth/register')
         .send({
           email: 'invalid-email',
           username: 'ab', // too short
           password: '123', // too short
-        });
-      
-      // In a real scenario this would be 400, but with mocks it's 201
-      // The important thing is that the endpoint is reachable and structured correctly
-      expect([400, 201]).toContain(response.status);
+        })
+        .expect(400);
 
-      // Test login with invalid data  
-      const loginResponse = await request(app.getHttpServer())
+      // Test login with invalid data
+      await request(app.getHttpServer())
         .post('/auth/login')
         .send({
           email: 'invalid-email',
           password: '123',
-        });
-      
-      // In a real scenario this would be 400, but with mocks may vary
-      expect([400, 401, 201]).toContain(loginResponse.status);
+        })
+        .expect(400);
     });
   });
 });
