@@ -12,7 +12,7 @@ import { LocalStrategy } from './strategies/local.strategy';
     PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
+      useFactory: (configService: ConfigService) => ({
         secret:
           configService.get('JWT_SECRET') ||
           'your-super-secret-jwt-key-change-this-in-production',

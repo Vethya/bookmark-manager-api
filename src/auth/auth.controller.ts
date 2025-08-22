@@ -11,6 +11,15 @@ import { RegisterDto } from './dto/register.dto';
 
 import { LocalAuthGuard } from './guards/local-auth.guard';
 
+interface AuthenticatedRequest extends Request {
+  user: {
+    id: string;
+    email: string;
+    username: string;
+    createdAt: Date;
+  };
+}
+
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
@@ -22,7 +31,7 @@ export class AuthController {
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(@Request() req: any) {
+  async login(@Request() req: AuthenticatedRequest) {
     return this.authService.login(req.user);
   }
 }

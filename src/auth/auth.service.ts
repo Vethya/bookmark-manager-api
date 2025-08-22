@@ -1,13 +1,21 @@
-import {
-  Injectable,
-  ConflictException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, ConflictException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
 
 import * as bcrypt from 'bcryptjs';
+
+interface UserPayload {
+  id: string;
+  email: string;
+  username: string;
+  createdAt: Date;
+}
+
+interface JwtPayload {
+  email: string;
+  sub: string;
+}
 
 @Injectable()
 export class AuthService {
@@ -60,10 +68,10 @@ export class AuthService {
     };
   }
 
-  async login(user: any) {
-    const payload = { email: user.email, sub: user.id };
+  async login(user: UserPayload) {
+    const payload: JwtPayload = { email: user.email, sub: user.id };
     return {
-      access_token: this.jwtService.sign(payload),
+      access_token: await this.jwtService.signAsync(payload),
       user: {
         id: user.id,
         email: user.email,
@@ -79,7 +87,8 @@ export class AuthService {
     });
 
     if (user && (await bcrypt.compare(password, user.password))) {
-      const { password, ...result } = user;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { password: _, ...result } = user;
       return result;
     }
     return null;

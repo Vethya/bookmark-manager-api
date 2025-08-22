@@ -7,6 +7,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateBookmarkDto } from './dto/create-bookmark.dto';
 import { UpdateBookmarkDto } from './dto/update-bookmark.dto';
 import { QueryBookmarkDto } from './dto/query-bookmark.dto';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class BookmarkService {
@@ -39,7 +40,7 @@ export class BookmarkService {
     const limitNum = parseInt(limit, 10);
     const skip = (pageNum - 1) * limitNum;
 
-    const where: any = { userId };
+    const where: Prisma.BookmarkWhereInput = { userId };
 
     // Add search functionality
     if (search) {
@@ -69,7 +70,7 @@ export class BookmarkService {
     // Parse tags and filter by tags if specified
     let filteredBookmarks = bookmarks.map((bookmark) => ({
       ...bookmark,
-      tags: JSON.parse(bookmark.tags || '[]'),
+      tags: JSON.parse(bookmark.tags || '[]') as string[],
     }));
 
     if (tags && tags.length > 0) {
@@ -116,7 +117,7 @@ export class BookmarkService {
 
     return {
       ...bookmark,
-      tags: JSON.parse(bookmark.tags || '[]'),
+      tags: JSON.parse(bookmark.tags || '[]') as string[],
     };
   }
 
@@ -125,6 +126,7 @@ export class BookmarkService {
     userId: string,
     updateBookmarkDto: UpdateBookmarkDto,
   ) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const bookmark = await this.findOne(id, userId);
 
     const { tags, ...updateData } = updateBookmarkDto;
@@ -162,7 +164,7 @@ export class BookmarkService {
     });
 
     const allTags = bookmarks
-      .map((bookmark) => JSON.parse(bookmark.tags || '[]'))
+      .map((bookmark) => JSON.parse(bookmark.tags || '[]') as string[])
       .flat()
       .filter((tag, index, array) => array.indexOf(tag) === index) // Remove duplicates
       .sort();
